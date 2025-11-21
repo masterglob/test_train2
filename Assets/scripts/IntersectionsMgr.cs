@@ -125,17 +125,35 @@ public class IntersectionsMgr
             || !isNear(linked2.Spline, linked1.Knot, linked2.Knot))
             return false;
 
+        int sI2 = linked2.Spline;
         simpleSwitch.Spline1Id = sI;
-        simpleSwitch.Spline2Id = linked2.Spline;
+        simpleSwitch.Spline2Id = sI2;
         simpleSwitch.Spline1Knot1 = kI;
-        simpleSwitch.Spline1Knot2 = nextKi(sI, kI);
+        simpleSwitch.Spline1Knot2 = kI2;
         simpleSwitch.Spline2Knot1 = linked1.Knot;
         simpleSwitch.Spline2Knot2 = linked2.Knot;
+        simpleSwitch.Spline1CloseKnotId = -1;
+        simpleSwitch.Spline2CloseKnotId = -1;
+        if (!splineContainer.Splines[sI].Closed)
+        {
+            if (kI == 0 || kI == nbKnots[sI] - 1)
+                simpleSwitch.Spline1CloseKnotId = kI;
+            if (kI2 == 0 || kI2 == nbKnots[sI] - 1)
+                simpleSwitch.Spline1CloseKnotId = kI2;
+        }
+        if (!splineContainer.Splines[sI2].Closed)
+        {
+            if (linked1.Knot == 0 || linked1.Knot == nbKnots[sI2] - 1)
+                simpleSwitch.Spline2CloseKnotId = linked1.Knot;
+            if (linked2.Knot == 0 || linked2.Knot == nbKnots[sI2] - 1)
+                simpleSwitch.Spline2CloseKnotId = linked2.Knot;
+        }
         return true;
     }
 
     private bool isNear(int sI, int kI1, int kI2)
     {
+        // TODO if not "Closed" => do not loop!
         return ((kI1 + 1) % nbKnots[sI] == kI2) || ((kI2 + 1) % nbKnots[sI] == kI1);
     }
 

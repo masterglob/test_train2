@@ -6,6 +6,8 @@ public class SimpleSwitch
 {
     public int Spline1Id = -1;
     public int Spline2Id = -1;
+    public int Spline1CloseKnotId = -1;
+    public int Spline2CloseKnotId = -1;
     public int Spline1Knot1 = -1;
     public int Spline1Knot2 = -1;
     public int Spline2Knot1 = -1;
@@ -18,9 +20,11 @@ public class SimpleSwitch
 
     public override string ToString()
     {
+        string close1 = Spline1CloseKnotId < 0 ? "" : $"(*{Spline1CloseKnotId})";
+        string close2 = Spline2CloseKnotId < 0 ? "" : $"(*{Spline2CloseKnotId})";
         return $"SimpleSwitch( " +
-               $"S1={Spline1Id}/{Spline1Knot1}/{Spline1Knot2}, " +
-               $"S2={Spline2Id}/{Spline2Knot1}/{Spline2Knot2} )";
+               $"S1={Spline1Id}/{Spline1Knot1}/{Spline1Knot2}{close1}, " +
+               $"S2={Spline2Id}/{Spline2Knot1}/{Spline2Knot2}{close2})";
     }
 
     public bool Compare(SimpleSwitch other)
@@ -43,6 +47,7 @@ public class SimpleSwitch
     private void Reverse()
     {
         (Spline1Id, Spline2Id) = (Spline2Id, Spline1Id);
+        (Spline1CloseKnotId, Spline2CloseKnotId) = (Spline2CloseKnotId, Spline1CloseKnotId);
         (Spline1Knot1, Spline1Knot2, Spline2Knot1, Spline2Knot2) = 
             (Spline2Knot1, Spline2Knot2, Spline1Knot1, Spline1Knot2);
     }
