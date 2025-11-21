@@ -59,7 +59,8 @@ public class IntersectionsMgr
                     foreach (var linkedKnot in lst)
                     {
                         res += $"(S{linkedKnot.Spline}/K{linkedKnot.Knot}), ";
-                        kLinks[skI] = linkedKnot;
+                        if (linkedKnot.Spline != sI)
+                            kLinks[skI] = linkedKnot;
                     }
                     Debug.Log($"Linked Knots from S{sI}/K{kI} : [{res}]");
                 }
