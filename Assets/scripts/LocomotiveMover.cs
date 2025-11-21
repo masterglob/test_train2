@@ -66,6 +66,12 @@ public class LocomotiveMover : MonoBehaviour
     {
         int kI = interMgr.GetKnotIndex(splineId, t);
         textDebug.text = $" Position in S{splineId}/K{kI}";
+
+        if (interMgr.getKnotLink(splineId, kI, out int spline2, out int knotSpline2))
+        {
+            textDebug.text += "\n";
+            textDebug.text += $" Comm S{splineId}/K{kI} <=> S{spline2}/K{knotSpline2}";
+        }
     }
 
     private void FixedUpdate()

@@ -10,32 +10,41 @@ public class IntersectionsMgr
     private SplineContainer splineContainer = null;
 
     private float[][] tValues;
+    private int[] nbKnots; // idx=  spline;
+    private Dictionary<SplineKnotIndex, SplineKnotIndex> kLinks;
 
     // Constructeur
     public IntersectionsMgr(SplineContainer splineContainer)
     {
         this.splineContainer = splineContainer;
 
-        tValues = new float[splineContainer.Splines.Count][];
+        int nbSplines = splineContainer.Splines.Count;
+        tValues = new float[nbSplines][];
+        nbKnots = new int[nbSplines];
+        kLinks = new Dictionary<SplineKnotIndex, SplineKnotIndex>();
         // Compute table of position for each Knot
-        for (int sI = 0; sI < splineContainer.Splines.Count; sI++)
+        for (int sI = 0; sI < nbSplines; sI++)
         {
             Spline spline = splineContainer.Splines[sI];
             tValues[sI] = new float[spline.Count];
             var native = new NativeSpline(spline);
 
+            nbKnots[sI] = spline.Count;
             for (int kI = 0; kI < spline.Count; kI++)
             {
                 BezierKnot k = spline[kI];
                 SplineUtility.GetNearestPoint(native, k.Position, out float3 nearest, out float t);
                 tValues[sI][kI] = t; 
-                Debug.Log($"Linked Knots from S{sI}/K{kI} : t={t}");
             }
         }
 
+        /* 
+         * 1: Find all connected Knots
+         * 2: 2 successive connected knots on 2 splines define a connection between 2 tracks.
+         */
         // Todo : store this result!
         KnotLinkCollection links = splineContainer.KnotLinkCollection;
-        for (int sI = 0; sI < splineContainer.Splines.Count; sI++)
+        for (int sI = 0; sI < nbSplines; sI++)
         {
             Spline spline = splineContainer.Splines[sI];
 
@@ -50,6 +59,7 @@ public class IntersectionsMgr
                     foreach (var linkedKnot in lst)
                     {
                         res += $"(S{linkedKnot.Spline}/K{linkedKnot.Knot}), ";
+                        kLinks[skI] = linkedKnot;
                     }
                     Debug.Log($"Linked Knots from S{sI}/K{kI} : [{res}]");
                 }
@@ -69,9 +79,31 @@ public class IntersectionsMgr
         return tValues[splineIndex][knotIndex];
     }
 
-    public void showLinks()
+    private SplineKnotIndex nextKnot(int sI, int kI)
     {
-        if (splineContainer == null) return;
+        if (sI < 0 || sI >= nbKnots.Length)
+            new SplineKnotIndex(sI, kI);
+        return new SplineKnotIndex(sI, (kI + 1) % nbKnots[sI]);
+    }
+
+    public bool getKnotLink(int sI, int kI, out int spline2, out int knotSpline2)
+    {
+        spline2 = 0;
+        knotSpline2 = 0;
+
+        if (kLinks.TryGetValue(new SplineKnotIndex(sI, kI), out SplineKnotIndex linked1) &&
+            kLinks.TryGetValue(nextKnot(sI, kI), out SplineKnotIndex linked2))
+        {
+            if (linked1.Spline != linked2.Spline)
+                return false;
+
+            spline2 = linked2.Spline;
+            knotSpline2 = linked1.Knot; // TODO : Direction!
+            return true;
+        }
+
+        return false;
+
     }
 
     public int GetKnotIndex(int splineIndex, float t)
