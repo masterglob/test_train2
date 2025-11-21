@@ -66,7 +66,7 @@ public class IntersectionsMgr
                         if (linkedKnot.Spline != sI)
                             kLinks[skI] = linkedKnot;
                     }
-                    Debug.Log($"Linked Knots from S{sI}/K{kI} : [{res}]");
+                    // Debug.Log($"Linked Knots from S{sI}/K{kI} : [{res}]");
                 }
             }
         }
@@ -83,12 +83,12 @@ public class IntersectionsMgr
             for (int kI = 0; kI < spline.Count; kI++)
             {
                 BezierKnot k = spline[kI];
-                if (!getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
+                if (getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
                 {
-                    continue;
+                    simpleSwitch.Normalize();
+                    switches[new SplineKnotIndex(sI, kI)] = simpleSwitch;
+                    Debug.Log($"Add switch S{sI}K{kI} => S{simpleSwitch}");
                 }
-
-
             }
         }
     }
@@ -118,7 +118,8 @@ public class IntersectionsMgr
         int kI2 = nextKi(sI, kI);
         if (!kLinks.TryGetValue(new SplineKnotIndex(sI, kI), out SplineKnotIndex linked1)
             || !kLinks.TryGetValue(new SplineKnotIndex(sI, kI2), out SplineKnotIndex linked2)
-            || linked1.Spline != linked2.Spline)
+            || linked1.Spline != linked2.Spline
+            || !isNear(linked2.Spline, linked1.Knot, linked2.Knot))
             return false;
 
         simpleSwitch.Spline1Id = sI;
@@ -128,6 +129,11 @@ public class IntersectionsMgr
         simpleSwitch.Spline2Knot1 = linked1.Knot;
         simpleSwitch.Spline2Knot2 = linked2.Knot;
         return true;
+    }
+
+    private bool isNear(int sI, int kI1, int kI2)
+    {
+        return ((kI1 + 1) % nbKnots[sI] == kI2) || ((kI2 + 1) % nbKnots[sI] == kI1);
     }
 
     public int GetNewSplineId(int sI, int kI)
