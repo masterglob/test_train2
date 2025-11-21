@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Splines;
 using UnityEngine.InputSystem;
 using Unity.Mathematics;
@@ -17,6 +18,7 @@ public class LocomotiveMover : MonoBehaviour
     [SerializeField] private float speed = 0.0f;
     public TMP_Text textSpeed;
     public TMP_Text textCurrSpline = null;
+    public Slider slider_0_1 = null;
     public float maxSpeed = 50f;      // vitesse max (m/s)
     public float drag = 0.5f;         // friction naturelle (m/s²)
 
@@ -25,12 +27,21 @@ public class LocomotiveMover : MonoBehaviour
 
     void Start()
     {
+        if (slider_0_1)
+            slider_0_1.onValueChanged.AddListener(OnSliderChanged);
+
         currentSpline = null;
         if (rail != null && rail.Splines != null && rail.Splines.Count > 0)
         {
             splineId = 0;
             currentSpline = rail.Splines[splineId];
         }
+    }
+
+    void OnSliderChanged(float value)
+    {
+        int iV = (int)value;
+        setSplineId(iV);
     }
 
     private void setSplineId(int id)
