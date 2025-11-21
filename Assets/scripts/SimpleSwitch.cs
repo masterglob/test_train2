@@ -11,6 +11,11 @@ public class SimpleSwitch
     public int Spline2Knot1 = -1;
     public int Spline2Knot2 = -1;
 
+    public int SelectSpline(bool s1)
+    {
+        return s1 ? Spline2Id : Spline1Id;
+    }
+
     public override string ToString()
     {
         return $"SimpleSwitch( " +

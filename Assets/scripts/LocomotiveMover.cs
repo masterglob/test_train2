@@ -31,22 +31,14 @@ public class LocomotiveMover : MonoBehaviour
 
     void Start()
     {
-        if (slider_0_1)
-            slider_0_1.onValueChanged.AddListener(OnSliderChanged);
 
         currentSpline = null;
         if (rail != null && rail.Splines != null && rail.Splines.Count > 0)
         {
             splineId = 0;
             currentSpline = rail.Splines[splineId];
-            interMgr = new IntersectionsMgr(rail);
+            interMgr = new IntersectionsMgr(rail, slider_0_1);
         }
-    }
-
-    void OnSliderChanged(float value)
-    {
-        int iV = (int)value;
-        setSplineId(iV);
     }
 
     private void setSplineId(int id)

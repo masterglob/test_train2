@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
+using UnityEngine.UI;
 
 using System.Collections.Generic;
 
@@ -8,6 +9,7 @@ public class IntersectionsMgr
 {
 
     private SplineContainer splineContainer = null;
+    private Slider slider;
 
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
@@ -16,9 +18,10 @@ public class IntersectionsMgr
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
     // Constructeur
-    public IntersectionsMgr(SplineContainer splineContainer)
+    public IntersectionsMgr(SplineContainer splineContainer, Slider slider)
     {
         this.splineContainer = splineContainer;
+        this.slider = slider;
 
         int nbSplines = splineContainer.Splines.Count;
         tValues = new float[nbSplines][];
@@ -138,14 +141,17 @@ public class IntersectionsMgr
 
     public int GetNewSplineId(int sI, int kI)
     {
-        if (!getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
+        if (!switches.TryGetValue(new SplineKnotIndex(sI, kI), out SimpleSwitch ss))
+        {
             return sI;
+        }
 
-        // Currently on a section that has 2 possible path : sI and sI2
-
+        // Currently on a section that has 2 possible path
         // Search for switch managing this path
 
-        return simpleSwitch.Spline2Id;
+        bool choice = (int)slider.value != 0;
+        Debug.Log($"Select {choice} from S{ss}");
+        return ss.SelectSpline(choice);
     }
 
     public int GetKnotIndex(int splineIndex, float t)
