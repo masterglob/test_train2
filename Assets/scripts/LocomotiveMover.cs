@@ -7,6 +7,7 @@ using System;
 
 using TMPro;
 
+
 public class LocomotiveMover : MonoBehaviour
 {
     public SplineContainer rail; 
@@ -18,12 +19,15 @@ public class LocomotiveMover : MonoBehaviour
     [SerializeField] private float speed = 0.0f;
     public TMP_Text textSpeed;
     public TMP_Text textCurrSpline = null;
+    public TMP_Text textDebug = null;
     public Slider slider_0_1 = null;
     public float maxSpeed = 50f;      // vitesse max (m/s)
     public float drag = 0.5f;         // friction naturelle (m/s²)
 
     [Header("Acceleration")]
     public float maxAccel = 5f;       // accélération max (m/s²)
+
+    private IntersectionsMgr interMgr = null;
 
     void Start()
     {
@@ -35,6 +39,7 @@ public class LocomotiveMover : MonoBehaviour
         {
             splineId = 0;
             currentSpline = rail.Splines[splineId];
+            interMgr = new IntersectionsMgr(rail);
         }
     }
 
@@ -57,15 +62,22 @@ public class LocomotiveMover : MonoBehaviour
         }
     }
 
+    private void test(float t)
+    {
+        int kI = interMgr.GetKnotIndex(splineId, t);
+        textDebug.text = $" Position in S{splineId}/K{kI}";
+    }
+
     private void FixedUpdate()
     {
         if (currentSpline == null) return;
 
         updateParams();
 
-
         var native = new NativeSpline(currentSpline);
         float distance = SplineUtility.GetNearestPoint(native, transform.position, out float3 nearest, out float t);
+
+        test(t);
 
         transform.position = nearest;
 
