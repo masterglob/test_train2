@@ -13,6 +13,8 @@ public class IntersectionsMgr
     private int[] nbKnots; // idx=  spline;
     private Dictionary<SplineKnotIndex, SplineKnotIndex> kLinks;
 
+    private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
+
     // Constructeur
     public IntersectionsMgr(SplineContainer splineContainer)
     {
@@ -22,6 +24,8 @@ public class IntersectionsMgr
         tValues = new float[nbSplines][];
         nbKnots = new int[nbSplines];
         kLinks = new Dictionary<SplineKnotIndex, SplineKnotIndex>();
+        switches = new Dictionary<SplineKnotIndex, SimpleSwitch>();
+
         // Compute table of position for each Knot
         for (int sI = 0; sI < nbSplines; sI++)
         {
@@ -65,7 +69,27 @@ public class IntersectionsMgr
                     Debug.Log($"Linked Knots from S{sI}/K{kI} : [{res}]");
                 }
             }
+        }
 
+        CreateSwitches();
+    }
+
+    private void CreateSwitches()
+    {
+        int nbSplines = splineContainer.Splines.Count;
+        for (int sI = 0; sI < nbSplines; sI++)
+        {
+            Spline spline = splineContainer.Splines[sI];
+            for (int kI = 0; kI < spline.Count; kI++)
+            {
+                BezierKnot k = spline[kI];
+                if (!getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
+                {
+                    continue;
+                }
+
+
+            }
         }
     }
 
@@ -80,31 +104,42 @@ public class IntersectionsMgr
         return tValues[splineIndex][knotIndex];
     }
 
-    private SplineKnotIndex nextKnot(int sI, int kI)
+    private int nextKi(int sI, int kI)
     {
-        if (sI < 0 || sI >= nbKnots.Length)
-            new SplineKnotIndex(sI, kI);
-        return new SplineKnotIndex(sI, (kI + 1) % nbKnots[sI]);
+        if (sI < 0 || sI >= nbKnots.Length) return -1;
+        return (kI + 1) % nbKnots[sI];
     }
 
-    public bool getKnotLink(int sI, int kI, out int spline2, out int knotSpline2)
+    public bool getKnotLink(int sI, int kI, out SimpleSwitch simpleSwitch)
     {
-        spline2 = 0;
-        knotSpline2 = 0;
+        simpleSwitch = new SimpleSwitch();
 
-        if (kLinks.TryGetValue(new SplineKnotIndex(sI, kI), out SplineKnotIndex linked1) &&
-            kLinks.TryGetValue(nextKnot(sI, kI), out SplineKnotIndex linked2))
-        {
-            if (linked1.Spline != linked2.Spline)
-                return false;
+        // Check if Current position if between 2 joined knots.
+        int kI2 = nextKi(sI, kI);
+        if (!kLinks.TryGetValue(new SplineKnotIndex(sI, kI), out SplineKnotIndex linked1)
+            || !kLinks.TryGetValue(new SplineKnotIndex(sI, kI2), out SplineKnotIndex linked2)
+            || linked1.Spline != linked2.Spline)
+            return false;
 
-            spline2 = linked2.Spline;
-            knotSpline2 = linked1.Knot; // TODO : Direction!
-            return true;
-        }
+        simpleSwitch.Spline1Id = sI;
+        simpleSwitch.Spline2Id = linked2.Spline;
+        simpleSwitch.Spline1Knot1 = kI;
+        simpleSwitch.Spline1Knot2 = nextKi(sI, kI);
+        simpleSwitch.Spline2Knot1 = linked1.Knot;
+        simpleSwitch.Spline2Knot2 = linked2.Knot;
+        return true;
+    }
 
-        return false;
+    public int GetNewSplineId(int sI, int kI)
+    {
+        if (!getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
+            return sI;
 
+        // Currently on a section that has 2 possible path : sI and sI2
+
+        // Search for switch managing this path
+
+        return simpleSwitch.Spline2Id;
     }
 
     public int GetKnotIndex(int splineIndex, float t)

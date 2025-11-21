@@ -67,11 +67,18 @@ public class LocomotiveMover : MonoBehaviour
         int kI = interMgr.GetKnotIndex(splineId, t);
         textDebug.text = $" Position in S{splineId}/K{kI}";
 
-        if (interMgr.getKnotLink(splineId, kI, out int spline2, out int knotSpline2))
+        if (interMgr.getKnotLink(splineId, kI, out SimpleSwitch ss))
         {
             textDebug.text += "\n";
-            textDebug.text += $" Comm S{splineId}/K{kI} <=> S{spline2}/K{knotSpline2}";
+            textDebug.text += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
         }
+    }
+
+    private void CheckSplineChange(float t)
+    {
+        int kI = interMgr.GetKnotIndex(splineId, t);
+        setSplineId(interMgr.GetNewSplineId(splineId, kI));
+
     }
 
     private void FixedUpdate()
@@ -84,6 +91,7 @@ public class LocomotiveMover : MonoBehaviour
         float distance = SplineUtility.GetNearestPoint(native, transform.position, out float3 nearest, out float t);
 
         test(t);
+        CheckSplineChange(t);
 
         transform.position = nearest;
 
