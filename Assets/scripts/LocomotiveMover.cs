@@ -70,7 +70,6 @@ public class LocomotiveMover : MonoBehaviour
     private void CheckSplineChange(float t, float fwdSpeed)
     {
         int kI = interMgr.GetKnotIndex(splineId, t);
-        Debug.Log($"fwdSpeed={fwdSpeed}");
         bool isFwd = fwdSpeed >= 0;
 
         setSplineId(interMgr.GetNewSplineId(splineId, kI, isFwd));
@@ -95,7 +94,7 @@ public class LocomotiveMover : MonoBehaviour
         var native = new NativeSpline(currentSpline);
         float distance = SplineUtility.GetNearestPoint(native, transform.position, out float3 nearest, out float t);
 
-        // test(t);
+        test(t);
 
         transform.position = nearest;
 
