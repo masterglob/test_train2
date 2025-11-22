@@ -63,6 +63,7 @@ xcuserdata/
 UserSettings/
 
 # Les textures
+Assets/Darth_Artisan/*
 Assets/ADG_Textures/*
 Assets/TrueTrackSystem/*
 Assets/Tutorial*/*
