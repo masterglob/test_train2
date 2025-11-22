@@ -77,6 +77,14 @@ public class LocomotiveMover : MonoBehaviour
 
     }
 
+    // Return true if the train "forward" is reverse from the Pline direction
+    private bool IsSplneReverse(Vector3 forward)
+    {
+        float dotProduct = Vector3.Dot(transform.forward, forward);
+
+        return dotProduct < 0f;
+    }
+
     private void FixedUpdate()
     {
         if (currentSpline == null) return;
@@ -87,7 +95,7 @@ public class LocomotiveMover : MonoBehaviour
         var native = new NativeSpline(currentSpline);
         float distance = SplineUtility.GetNearestPoint(native, transform.position, out float3 nearest, out float t);
 
-        test(t);
+        // test(t);
 
         transform.position = nearest;
 
@@ -97,8 +105,12 @@ public class LocomotiveMover : MonoBehaviour
         var remappedForward = new Vector3(0, 0, 1);
         var remappedUp = new Vector3(0, 1, 0);
         var axisRemapRotation = Quaternion.Inverse(Quaternion.LookRotation(remappedForward, remappedUp));
+        if (IsSplneReverse(forward))
+        {
+            // Si la direction est inversée, applique une rotation de 180 degrés autour de l'axe Y (ou un autre axe si nécessaire)
+            axisRemapRotation *= Quaternion.Euler(0, 180f, 0);  // Inverser la direction sur l'axe Y
+        }
 
-        // TODO : la rotation devra prendre en compte un potentiel changement de direction.
         transform.rotation = Quaternion.LookRotation(forward, up) * axisRemapRotation;
 
         Vector3 velocity = (transform.position - previousPosition) / Time.deltaTime;
@@ -114,6 +126,11 @@ public class LocomotiveMover : MonoBehaviour
         if (keyboard.sKey.isPressed)
         {
             Throttle(-power);
+        }
+        // Freinage rapide!
+        if (keyboard.spaceKey.isPressed)
+        {
+            speed *= 0.8f;
         }
     }
 
