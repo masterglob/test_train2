@@ -13,8 +13,41 @@ public class SimpleSwitch
     public int Spline2Knot1 = -1;
     public int Spline2Knot2 = -1;
 
-    public int SelectSpline(bool s1)
+    public int SelectSpline(bool s1, bool isFwd)
     {
+        // Check if this is a closed end
+        if (isFwd)
+        {
+            // Dead end on S1/FWD?
+            if (Spline1CloseKnotId == Spline1Knot2)
+            {
+                Debug.Log("Dead end S1/F");
+                return Spline2Id;
+            }
+            // Dead end on S2/FWD?
+            if (Spline2CloseKnotId == Spline2Knot2)
+            {
+                Debug.Log("Dead end S2/F");
+                return Spline1Id;
+            }
+
+        }
+        else
+        {
+            // Dead end on S1/BWD?
+            if (Spline1CloseKnotId == Spline1Knot1)
+            {
+                Debug.Log("Dead end S1/B");
+                return Spline2Id;
+            }
+            // Dead end on S2/BWD?
+            if (Spline2CloseKnotId == Spline2Knot1)
+            {
+                Debug.Log("Dead end S2/B");
+                return Spline1Id;
+            }
+        }
+
         return s1 ? Spline2Id : Spline1Id;
     }
 

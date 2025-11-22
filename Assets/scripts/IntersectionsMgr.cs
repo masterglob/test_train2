@@ -157,19 +157,41 @@ public class IntersectionsMgr
         return ((kI1 + 1) % nbKnots[sI] == kI2) || ((kI2 + 1) % nbKnots[sI] == kI1);
     }
 
-    public int GetNewSplineId(int sI, int kI)
+    /**
+     * isFwd is True if the direction on sI is from kI to kI+1
+     */
+    public int GetNewSplineId(int sI, int kI, bool isFwd)
     {
         if (!switches.TryGetValue(new SplineKnotIndex(sI, kI), out SimpleSwitch ss))
         {
             return sI;
         }
 
+        // isFwd is relative to sI, but ss may be in another direction!
+        if (ss.Spline1Id == sI)
+        {
+            // Check direction
+            if (ss.Spline1Knot2 == kI)
+            {
+                Debug.Log("Invert Dir on S1");
+                isFwd = !isFwd;
+            }
+        }
+        else
+        {
+            if (ss.Spline2Knot2 == kI)
+            {
+                Debug.Log("Invert Dir on S2");
+                isFwd = !isFwd;
+            }
+        }
+
         // Currently on a section that has 2 possible path
         // Search for switch managing this path
 
-        bool choice = (int)slider.value != 0;
-        Debug.Log($"Select {choice} from S{ss}");
-        return ss.SelectSpline(choice);
+        bool choice = (int)slider.value != 0; // TODO, One slider per switch!
+        Debug.Log($"Select {choice} from S{ss}, isFwd={isFwd}");
+        return ss.SelectSpline(choice, isFwd);
     }
 
     public int GetKnotIndex(int splineIndex, float t)

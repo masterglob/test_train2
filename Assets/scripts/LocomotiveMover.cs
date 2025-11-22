@@ -21,6 +21,7 @@ public class LocomotiveMover : MonoBehaviour
     public TMP_Text textCurrSpline = null;
     public TMP_Text textDebug = null;
     public Slider slider_0_1 = null;
+    public Slider slider_fwd = null;
     public float maxSpeed = 50f;      // vitesse max (m/s)
     public float drag = 0.5f;         // friction naturelle (m/s²)
 
@@ -66,10 +67,13 @@ public class LocomotiveMover : MonoBehaviour
         }
     }
 
-    private void CheckSplineChange(float t)
+    private void CheckSplineChange(float t, float fwdSpeed)
     {
         int kI = interMgr.GetKnotIndex(splineId, t);
-        setSplineId(interMgr.GetNewSplineId(splineId, kI));
+        Debug.Log($"fwdSpeed={fwdSpeed}");
+        bool isFwd = fwdSpeed >= 0;
+
+        setSplineId(interMgr.GetNewSplineId(splineId, kI, isFwd));
 
     }
 
@@ -77,13 +81,13 @@ public class LocomotiveMover : MonoBehaviour
     {
         if (currentSpline == null) return;
 
+        Vector3 previousPosition = transform.position;
         updateParams();
 
         var native = new NativeSpline(currentSpline);
         float distance = SplineUtility.GetNearestPoint(native, transform.position, out float3 nearest, out float t);
 
         test(t);
-        CheckSplineChange(t);
 
         transform.position = nearest;
 
@@ -94,7 +98,12 @@ public class LocomotiveMover : MonoBehaviour
         var remappedUp = new Vector3(0, 1, 0);
         var axisRemapRotation = Quaternion.Inverse(Quaternion.LookRotation(remappedForward, remappedUp));
 
+        // TODO : la rotation devra prendre en compte un potentiel changement de direction.
         transform.rotation = Quaternion.LookRotation(forward, up) * axisRemapRotation;
+
+        Vector3 velocity = (transform.position - previousPosition) / Time.deltaTime;
+        float dot = Vector3.Dot(forward, velocity.normalized);
+        CheckSplineChange(t, dot);
 
         var keyboard = Keyboard.current;
         if (keyboard.wKey.isPressed)
