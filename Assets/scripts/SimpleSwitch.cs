@@ -13,7 +13,19 @@ public class SimpleSwitch
     public int Spline2Knot1 = -1;
     public int Spline2Knot2 = -1;
     public SwIndicator Swi = null;
-    public bool HasDirectPos = true;
+
+    private bool HasDirectPos = true;
+
+    public bool IsDirect() {  return HasDirectPos; }
+
+    public void SetDirect(bool direct)
+    {
+        HasDirectPos = direct;
+        if (Swi != null)
+        {
+            Swi.SetDirect(direct);
+        }
+    }
 
     public int SelectSpline(bool s1, bool isFwd)
     {

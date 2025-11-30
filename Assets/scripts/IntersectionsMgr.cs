@@ -25,9 +25,6 @@ public class IntersectionsMgr : MonoBehaviour
      */
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
-    private bool allDirect = true; // TODO : remove when several switches are possible!
-    private bool allDeviate = false;
-
     // Constructeur
     public void Start()
     {
@@ -103,21 +100,15 @@ public class IntersectionsMgr : MonoBehaviour
 
     public void SetGlobalDirect(bool direct)
     {
-
-        allDirect = false;
-        allDeviate = false;
-        if (direct) allDirect = true;
-        else allDeviate = true;
-
-        if (allSWIs == null)
+        if (switches == null)
         {
-            Debug.LogError("Assign a allSWIs in IntersectionMgr.");
+            Debug.LogError("Assign a switches in IntersectionMgr.");
             return;
         }
 
-        foreach (SwIndicator swi in allSWIs)
+        foreach (SimpleSwitch ss in switches.Values)
         {
-            swi.SetDirect(direct);
+            ss.SetDirect(direct);
         }
     }
 
@@ -245,22 +236,7 @@ public class IntersectionsMgr : MonoBehaviour
         // Currently on a section that has 2 possible path
         // Search for switch managing this path
 
-        bool direct;
-        if (allDirect)
-        {
-            direct = true;
-        }
-        else if (allDeviate)
-        {
-            direct = false;
-        }
-        else
-        {
-            // TODO!
-            direct = true;
-        }
-        // Debug.Log($"Select {choice} from S{ss}, isFwd={isFwd}");
-        return ss.SelectSpline(!direct, isFwd);
+        return ss.SelectSpline(!ss.IsDirect(), isFwd);
     }
 
     public int GetKnotIndex(int splineIndex, float t)
