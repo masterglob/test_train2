@@ -61,11 +61,17 @@ public class LocomotiveMover : MonoBehaviour
             textDebug.text += "\n";
             textDebug.text += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
         }
-
-        // Search for next Switch (only when moving forward)
-        if (speed > 0.01f)
+        else
         {
-            interMgr.ShowNextSwitch(splineId, kI, !isBwd);
+            // Search for next Switch (only when moving forward)
+            if (speed > -0.01f)
+            {
+                SimpleSwitch ss2 = interMgr.ShowNextSwitch(splineId, kI, !isBwd);
+                if (ss2 != null)
+                {
+                    textDebug.text += $"\nNext switch:{ss2.ToShortString()} ";
+                }
+            }
         }
     }
 

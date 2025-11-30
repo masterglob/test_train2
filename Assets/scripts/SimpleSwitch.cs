@@ -78,6 +78,10 @@ public class SimpleSwitch
                $"S1={Spline1Id}/{Spline1Knot1}/{Spline1Knot2}{close1}, " +
                $"S2={Spline2Id}/{Spline2Knot1}/{Spline2Knot2}{close2})";
     }
+    public string ToShortString()
+    {
+        return $"SW_{Spline1Id}_{Spline2Id}";
+    }
 
     public bool Compare(SimpleSwitch other)
     {
