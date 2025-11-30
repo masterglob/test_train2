@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using UnityEngine.UI;
 
 using System.Collections.Generic;
+using TMPro;
 
 public class IntersectionsMgr : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class IntersectionsMgr : MonoBehaviour
     public GameObject parentSwis;
 
     private SwIndicator[] allSWIs;
+    public SwIndicator[] GetSWIs(){return allSWIs;}
 
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
@@ -25,6 +27,13 @@ public class IntersectionsMgr : MonoBehaviour
      */
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
+    // For switch indicators
+    public RectTransform uiPanel = null;
+    public GameObject btnPrefab;
+    private List<UIIndicator> uiIndicators = new List<UIIndicator>();
+    private float yBtnOffset = 50f;
+    private float xBtnOffset = 300f;
+
     // Constructeur
     public void Start()
     {
@@ -36,11 +45,6 @@ public class IntersectionsMgr : MonoBehaviour
 
         // Create list of Switch Indicators(SWI)
         allSWIs = parentSwis.GetComponentsInChildren<SwIndicator>();
-        foreach (SwIndicator swi in allSWIs)
-        {
-            Debug.Log("SWI trouvé: " + swi.gameObject.name);
-        }
-
 
         int nbSplines = splineContainer.Splines.Count;
         tValues = new float[nbSplines][];
@@ -96,6 +100,65 @@ public class IntersectionsMgr : MonoBehaviour
         CreateSwitches();
 
         SetGlobalDirect(true);
+
+        createUiBtns();
+    }
+
+    private void createUiBtns()
+    {
+        if (uiPanel == null) return;
+
+        float currentX = 0f;
+        float currentY = 0f;
+
+        foreach (SwIndicator swi in allSWIs)
+        {
+            GameObject go = Instantiate(btnPrefab, uiPanel);
+
+            Button btn = go.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.AddListener(() => OnButtonClicked(swi));
+            }
+
+            UIIndicator ui = go.GetComponent<UIIndicator>();
+            swi.uiIndicator = ui;
+            ui.SetState(swi.IsDirect());
+
+            TMP_Text label = go.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+            {
+                label.text = swi.gameObject.name;
+            }
+
+            uiIndicators.Add(ui);
+
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(currentX, currentY);
+
+            currentX += xBtnOffset;
+            if (currentX > 400)
+            {
+                currentX = 0f;
+                currentY -= yBtnOffset;
+            }
+        }
+    }
+
+    // Fonction qui sera appelée lors du clic
+    private void OnButtonClicked(SwIndicator swi)
+    {
+        // Attention le clic est sur le Bouton, il faut retrouver le
+        // Switch qui correspond
+        foreach (SimpleSwitch ss in switches.Values)
+        {
+            if (ss.Swi == swi)
+            {
+                ss.InvertDirect();
+                return;
+            }
+        }
+
     }
 
     public void SetGlobalDirect(bool direct)
@@ -125,7 +188,6 @@ public class IntersectionsMgr : MonoBehaviour
                 {
                     simpleSwitch.Normalize();
                     // Find matching Indicator (SWI)
-                    plop();
                     Debug.Log($"Add switch S{sI}K{kI} => S{simpleSwitch}");
                     switches[simpleSwitch.GetDirectKnot()] = simpleSwitch;
                     switches[simpleSwitch.GetDeviateKnot()] = simpleSwitch;
@@ -133,12 +195,6 @@ public class IntersectionsMgr : MonoBehaviour
                 }
             }
         }
-    }
-
-    private void plop ()
-    {
-        foreach (SwIndicator swi in allSWIs)
-        { }
     }
 
     public float GetT(int splineIndex, int knotIndex)

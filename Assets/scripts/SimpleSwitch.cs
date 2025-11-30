@@ -27,6 +27,11 @@ public class SimpleSwitch
         }
     }
 
+    public void InvertDirect()
+    {
+        SetDirect(!HasDirectPos);
+    }
+
     public int SelectSpline(bool s1, bool isFwd)
     {
         // Check if this is a closed end
