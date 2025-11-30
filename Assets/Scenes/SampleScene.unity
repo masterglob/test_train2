@@ -1354,7 +1354,7 @@ GameObject:
   - component: {fileID: 337637996}
   - component: {fileID: 337637997}
   m_Layer: 0
-  m_Name: SWI_Sx5
+  m_Name: SWI_S1_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4178,7 +4178,7 @@ GameObject:
   - component: {fileID: 594628958}
   - component: {fileID: 594628959}
   m_Layer: 0
-  m_Name: SWI_Sx3
+  m_Name: SWI_S0_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15862,7 +15862,7 @@ GameObject:
   - component: {fileID: 1231668408}
   - component: {fileID: 1231668409}
   m_Layer: 0
-  m_Name: SWI_Sx4
+  m_Name: SWI_S0_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

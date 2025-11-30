@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Splines;
 
 [System.Serializable]
@@ -12,6 +12,8 @@ public class SimpleSwitch
     public int Spline1Knot2 = -1;
     public int Spline2Knot1 = -1;
     public int Spline2Knot2 = -1;
+    public SwIndicator Swi = null;
+    public bool HasDirectPos = true;
 
     public int SelectSpline(bool s1, bool isFwd)
     {
@@ -77,6 +79,49 @@ public class SimpleSwitch
                Spline2Knot2 == other.Spline1Knot2);
     }
 
+    // Find the closest SwIndicator and assigns it
+    public void AssignSwi(SplineContainer splineContainer, SwIndicator[] indicators)
+    {
+        if (indicators == null || indicators.Length == 0)
+        {
+            Swi = null;
+            return;
+        }
+
+        SplineKnotIndex knotIndex = this.GetDirectKnot();
+        var knot = splineContainer.Splines[knotIndex.Spline][knotIndex.Knot];
+        Vector3 switchPos = splineContainer.transform.TransformPoint(knot.Position);
+
+        float minDistance = float.MaxValue;
+        SwIndicator closest = null;
+
+        foreach (var indicator in indicators)
+        {
+            if (indicator == null) continue;
+
+            float distance = Vector3.Distance(switchPos, indicator.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closest = indicator;
+            }
+        }
+
+        Swi = closest;
+        if (Swi != null)
+        {
+            Debug.Log(
+                $"[SimpleSwitch] Assigned indicator '{Swi.name}' to switch {this}. " 
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"[SimpleSwitch] No suitable SwIndicator found for switch at {switchPos}."
+            );
+        }
+    }
+
     private void Reverse()
     {
         (Spline1Id, Spline2Id) = (Spline2Id, Spline1Id);
@@ -89,5 +134,21 @@ public class SimpleSwitch
     {
         if (Spline1Id > Spline2Id)
             Reverse();
+    }
+
+    public SplineKnotIndex GetDirectKnot()
+    {
+        if (Spline1Knot1 < Spline1Knot2)
+            return new SplineKnotIndex(Spline1Id, Spline1Knot1);
+        else
+            return new SplineKnotIndex(Spline1Id, Spline1Knot2);
+    }
+
+    public SplineKnotIndex GetDeviateKnot()
+    {
+        if (Spline2Knot1 < Spline2Knot2)
+            return new SplineKnotIndex(Spline2Id, Spline2Knot1);
+        else
+            return new SplineKnotIndex(Spline2Id, Spline2Knot2);
     }
 }

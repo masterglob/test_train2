@@ -17,9 +17,15 @@ public class IntersectionsMgr : MonoBehaviour
     private int[] nbKnots; // idx=  spline;
     private Dictionary<SplineKnotIndex, SplineKnotIndex> kLinks;
 
+    /**
+     * For each Knot, an associated "SimpleSwitch" components, that 
+     * only contains the Splines knots and dead ends.
+     * Note that each "physical switch" exists in two instances here (one in each 
+     * spline.)
+     */
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
-    private bool allDirect = true; // TODO : remove when several switaches are possible!
+    private bool allDirect = true; // TODO : remove when several switches are possible!
     private bool allDeviate = false;
 
     // Constructeur
@@ -30,6 +36,14 @@ public class IntersectionsMgr : MonoBehaviour
             Debug.LogError("Missing inputs in IntersectionsMgr");
             return;
         }
+
+        // Create list of Switch Indicators(SWI)
+        allSWIs = parentSwis.GetComponentsInChildren<SwIndicator>();
+        foreach (SwIndicator swi in allSWIs)
+        {
+            Debug.Log("SWI trouvé: " + swi.gameObject.name);
+        }
+
 
         int nbSplines = splineContainer.Splines.Count;
         tValues = new float[nbSplines][];
@@ -49,7 +63,7 @@ public class IntersectionsMgr : MonoBehaviour
             {
                 BezierKnot k = spline[kI];
                 SplineUtility.GetNearestPoint(native, k.Position, out float3 nearest, out float t);
-                tValues[sI][kI] = t; 
+                tValues[sI][kI] = t;
             }
         }
 
@@ -84,14 +98,6 @@ public class IntersectionsMgr : MonoBehaviour
 
         CreateSwitches();
 
-        // Create list of Switch Indicators(SWI)
-        allSWIs = parentSwis.GetComponentsInChildren<SwIndicator>();
-
-        foreach (SwIndicator swi in allSWIs)
-        {
-            Debug.Log("SWI trouvé: " + swi.gameObject.name);
-        }
-
         SetGlobalDirect(true);
     }
 
@@ -121,17 +127,27 @@ public class IntersectionsMgr : MonoBehaviour
         for (int sI = 0; sI < nbSplines; sI++)
         {
             Spline spline = splineContainer.Splines[sI];
-            for (int kI = 0; kI < spline.Count; kI++)
+            for (int kI = sI + 1; kI < spline.Count; kI++)
             {
                 BezierKnot k = spline[kI];
                 if (getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
                 {
                     simpleSwitch.Normalize();
-                    switches[new SplineKnotIndex(sI, kI)] = simpleSwitch;
+                    // Find matching Indicator (SWI)
+                    plop();
                     Debug.Log($"Add switch S{sI}K{kI} => S{simpleSwitch}");
+                    switches[simpleSwitch.GetDirectKnot()] = simpleSwitch;
+                    switches[simpleSwitch.GetDeviateKnot()] = simpleSwitch;
+                    simpleSwitch.AssignSwi(splineContainer, allSWIs);
                 }
             }
         }
+    }
+
+    private void plop ()
+    {
+        foreach (SwIndicator swi in allSWIs)
+        { }
     }
 
     public float GetT(int splineIndex, int knotIndex)
