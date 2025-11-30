@@ -18,15 +18,13 @@ public class LocomotiveMover : MonoBehaviour
     public TMP_Text textSpeed;
     public TMP_Text textCurrSpline = null;
     public TMP_Text textDebug = null;
-    public Slider slider_0_1 = null;
-    public Slider slider_fwd = null;
     public float maxSpeed = 50f;      // vitesse max (m/s)
     public float drag = 0.5f;         // friction naturelle (m/s²)
 
     [Header("Acceleration")]
     public float maxAccel = 5f;       // accélération max (m/s²)
 
-    private IntersectionsMgr interMgr = null;
+    public IntersectionsMgr interMgr = null;
     private bool isFwd = false;
 
     void Start()
@@ -37,7 +35,6 @@ public class LocomotiveMover : MonoBehaviour
         {
             splineId = 0;
             currentSpline = rail.Splines[splineId];
-            interMgr = new IntersectionsMgr(rail, slider_0_1);
         }
     }
 
@@ -85,7 +82,16 @@ public class LocomotiveMover : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (currentSpline == null) return;
+        if (currentSpline == null)
+        {
+            Debug.LogError("Assign a currentSpline in Locomotive Mover.");
+            return;
+        }
+        if (interMgr == null)
+        {
+            Debug.LogError("Assign a interMgr in Locomotive Mover.");
+            return;
+        }
 
         Vector3 previousPosition = transform.position;
         updateParams();

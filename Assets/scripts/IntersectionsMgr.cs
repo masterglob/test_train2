@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 using System.Collections.Generic;
 
-public class IntersectionsMgr
+public class IntersectionsMgr : MonoBehaviour
 {
 
-    private SplineContainer splineContainer = null;
-    private Slider slider;
+    public SplineContainer splineContainer = null;
+    public Slider slider;
 
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
@@ -18,10 +18,9 @@ public class IntersectionsMgr
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
     // Constructeur
-    public IntersectionsMgr(SplineContainer splineContainer, Slider slider)
+    public void Start()
     {
-        this.splineContainer = splineContainer;
-        this.slider = slider;
+        if (slider == null || splineContainer == null) return;
 
         int nbSplines = splineContainer.Splines.Count;
         tValues = new float[nbSplines][];
@@ -75,6 +74,18 @@ public class IntersectionsMgr
         }
 
         CreateSwitches();
+    }
+
+    public void SetGlobalDirect(bool direct)
+    {
+        if (slider == null)
+        {
+            Debug.LogError("Assign a slider in KbdMgr.");
+            return;
+        }
+
+        slider.value = direct ? 0 : 1;
+        Debug.Log($"Switch global to {slider.value}");
     }
 
     private void CreateSwitches()
@@ -173,7 +184,7 @@ public class IntersectionsMgr
             // Check direction
             if (ss.Spline1Knot2 == kI)
             {
-                Debug.Log("Invert Dir on S1");
+                // Debug.Log("Invert Dir on S1");
                 isFwd = !isFwd;
             }
         }
@@ -181,7 +192,7 @@ public class IntersectionsMgr
         {
             if (ss.Spline2Knot2 == kI)
             {
-                Debug.Log("Invert Dir on S2");
+                // Debug.Log("Invert Dir on S2");
                 isFwd = !isFwd;
             }
         }
@@ -190,7 +201,7 @@ public class IntersectionsMgr
         // Search for switch managing this path
 
         bool choice = (int)slider.value != 0; // TODO, One slider per switch!
-        Debug.Log($"Select {choice} from S{ss}, isFwd={isFwd}");
+        // Debug.Log($"Select {choice} from S{ss}, isFwd={isFwd}");
         return ss.SelectSpline(choice, isFwd);
     }
 
