@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Splines;
-using UnityEngine.InputSystem;
 using Unity.Mathematics;
 using System;
 
@@ -15,7 +14,6 @@ public class LocomotiveMover : MonoBehaviour
     private Spline currentSpline;
     private int splineId = 0;
 
-    [SerializeField] private float power = 1.0f;
     [SerializeField] private float speed = 0.0f;
     public TMP_Text textSpeed;
     public TMP_Text textCurrSpline = null;
@@ -124,21 +122,6 @@ public class LocomotiveMover : MonoBehaviour
         float dot = Vector3.Dot(forward, velocity.normalized);
         CheckSplineChange(t, dot);
 
-        var keyboard = Keyboard.current;
-        if (keyboard.wKey.isPressed)
-        {
-            Throttle(power);
-        }
-
-        if (keyboard.sKey.isPressed)
-        {
-            Throttle(-power);
-        }
-        // Freinage rapide!
-        if (keyboard.spaceKey.isPressed)
-        {
-            speed *= 0.9f;
-        }
     }
 
     private void updateParams()
@@ -164,8 +147,13 @@ public class LocomotiveMover : MonoBehaviour
         textCurrSpline.text = $"Track: {splineId}";
     }
 
-    private void Throttle(float power)
+    public void Throttle(float power)
     {
         speed += power * maxAccel * Time.fixedDeltaTime;
+    }
+
+    public void Brake()
+    {
+        speed *= 0.9f;
     }
 }
