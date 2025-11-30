@@ -29,6 +29,7 @@ public class LocomotiveMover : MonoBehaviour
     public float maxAccel = 5f;       // accélération max (m/s²)
 
     private IntersectionsMgr interMgr = null;
+    private bool isFwd = false;
 
     void Start()
     {
@@ -104,7 +105,14 @@ public class LocomotiveMover : MonoBehaviour
         var remappedForward = new Vector3(0, 0, 1);
         var remappedUp = new Vector3(0, 1, 0);
         var axisRemapRotation = Quaternion.Inverse(Quaternion.LookRotation(remappedForward, remappedUp));
-        if (IsSplneReverse(forward))
+
+        if (Math.Abs(speed) > 0.0001f)
+        {
+            // Note that when train is "stopped", direction remains unchanged to avoid flickering
+            // on switch zones
+            isFwd = IsSplneReverse(forward);
+        }
+        if (isFwd)
         {
             // Si la direction est inversée, applique une rotation de 180 degrés autour de l'axe Y (ou un autre axe si nécessaire)
             axisRemapRotation *= Quaternion.Euler(0, 180f, 0);  // Inverser la direction sur l'axe Y
@@ -129,7 +137,7 @@ public class LocomotiveMover : MonoBehaviour
         // Freinage rapide!
         if (keyboard.spaceKey.isPressed)
         {
-            speed *= 0.8f;
+            speed *= 0.9f;
         }
     }
 
