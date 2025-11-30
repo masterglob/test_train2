@@ -10,6 +10,7 @@ public class IntersectionsMgr : MonoBehaviour
 
     public SplineContainer splineContainer = null;
     public Slider slider;
+    public SwIndicator SWI1;
 
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
@@ -86,6 +87,9 @@ public class IntersectionsMgr : MonoBehaviour
 
         slider.value = direct ? 0 : 1;
         Debug.Log($"Switch global to {slider.value}");
+
+        if (SWI1 != null)
+            SWI1.Text = direct ? "^" : ">";
     }
 
     private void CreateSwitches()
