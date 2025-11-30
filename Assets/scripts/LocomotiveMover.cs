@@ -25,7 +25,7 @@ public class LocomotiveMover : MonoBehaviour
     public float maxAccel = 5f;       // accélération max (m/s²)
 
     public IntersectionsMgr interMgr = null;
-    private bool isFwd = false;
+    private bool isBwd = false;
 
     void Start()
     {
@@ -61,14 +61,21 @@ public class LocomotiveMover : MonoBehaviour
             textDebug.text += "\n";
             textDebug.text += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
         }
+
+        // Search for next Switch (only when moving forward)
+        if (speed > 0.01f)
+        {
+            interMgr.ShowNextSwitch(splineId, kI, !isBwd);
+        }
     }
 
     private void CheckSplineChange(float t, float fwdSpeed)
     {
         int kI = interMgr.GetKnotIndex(splineId, t);
-        bool isFwd = fwdSpeed >= 0;
 
-        setSplineId(interMgr.GetNewSplineId(splineId, kI, isFwd));
+        if (Math.Abs(speed) < 0.001) return;
+
+        setSplineId(interMgr.GetNewSplineId(splineId, kI, fwdSpeed >= 0));
 
     }
 
@@ -110,13 +117,8 @@ public class LocomotiveMover : MonoBehaviour
         var remappedUp = new Vector3(0, 1, 0);
         var axisRemapRotation = Quaternion.Inverse(Quaternion.LookRotation(remappedForward, remappedUp));
 
-        if (Math.Abs(speed) > 0.0001f)
-        {
-            // Note that when train is "stopped", direction remains unchanged to avoid flickering
-            // on switch zones
-            isFwd = IsSplneReverse(forward);
-        }
-        if (isFwd)
+        isBwd = IsSplneReverse(forward);
+        if (isBwd)
         {
             // Si la direction est inversée, applique une rotation de 180 degrés autour de l'axe Y (ou un autre axe si nécessaire)
             axisRemapRotation *= Quaternion.Euler(0, 180f, 0);  // Inverser la direction sur l'axe Y

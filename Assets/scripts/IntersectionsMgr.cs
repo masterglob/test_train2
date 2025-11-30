@@ -208,10 +208,18 @@ public class IntersectionsMgr : MonoBehaviour
         return tValues[splineIndex][knotIndex];
     }
 
-    private int nextKi(int sI, int kI)
+    private int nextKi(int sI, int kI, bool isFwd=true)
     {
-        if (nbKnots == null || sI < 0 || sI >= nbKnots.Length) return -1;
-        return (kI + 1) % nbKnots[sI];
+        if (isFwd)
+        {
+            if (nbKnots == null || sI < 0 || sI >= nbKnots.Length) return -1;
+            return (kI + 1) % nbKnots[sI];
+        }
+        else
+        {
+            if (nbKnots == null || sI < 0 || sI >= nbKnots.Length) return -1;
+            return (kI + nbKnots[sI] - 1) % nbKnots[sI];
+        }
     }
 
     public bool getKnotLink(int sI, int kI, out SimpleSwitch simpleSwitch)
@@ -323,4 +331,22 @@ public class IntersectionsMgr : MonoBehaviour
         return -1;
     }
 
+    // Indicate the next switch
+    public void ShowNextSwitch(int sI, int kI, bool isFwd)
+    {
+        if (switches == null)  return ;
+
+        // limit to 10 next sections
+        for (int i = 0; i < 10; i++)
+        {
+            Debug.Log($"sI={sI}, kI={kI},  isFwd ={isFwd}");
+            if (getKnotLink(sI, kI, out SimpleSwitch ss))
+            {
+                Debug.Log($"Next switch : {ss.ToString()}");
+                return;
+            }
+            kI = nextKi(sI, kI, isFwd);
+        }
+
+    }
 }
