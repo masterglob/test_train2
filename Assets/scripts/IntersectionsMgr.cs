@@ -9,8 +9,9 @@ public class IntersectionsMgr : MonoBehaviour
 {
 
     public SplineContainer splineContainer = null;
-    public Slider slider;
-    public SwIndicator SWI1;
+    public GameObject parentSwis;
+
+    private SwIndicator[] allSWIs;
 
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
@@ -18,10 +19,17 @@ public class IntersectionsMgr : MonoBehaviour
 
     private Dictionary<SplineKnotIndex, SimpleSwitch> switches;
 
+    private bool allDirect = true; // TODO : remove when several switaches are possible!
+    private bool allDeviate = false;
+
     // Constructeur
     public void Start()
     {
-        if (slider == null || splineContainer == null) return;
+        if (splineContainer == null || parentSwis == null)
+        {
+            Debug.LogError("Missing inputs in IntersectionsMgr");
+            return;
+        }
 
         int nbSplines = splineContainer.Splines.Count;
         tValues = new float[nbSplines][];
@@ -75,21 +83,36 @@ public class IntersectionsMgr : MonoBehaviour
         }
 
         CreateSwitches();
+
+        // Create list of Switch Indicators(SWI)
+        allSWIs = parentSwis.GetComponentsInChildren<SwIndicator>();
+
+        foreach (SwIndicator swi in allSWIs)
+        {
+            Debug.Log("SWI trouvé: " + swi.gameObject.name);
+        }
+
+        SetGlobalDirect(true);
     }
 
     public void SetGlobalDirect(bool direct)
     {
-        if (slider == null)
+
+        allDirect = false;
+        allDeviate = false;
+        if (direct) allDirect = true;
+        else allDeviate = true;
+
+        if (allSWIs == null)
         {
-            Debug.LogError("Assign a slider in KbdMgr.");
+            Debug.LogError("Assign a allSWIs in IntersectionMgr.");
             return;
         }
 
-        slider.value = direct ? 0 : 1;
-        Debug.Log($"Switch global to {slider.value}");
-
-        if (SWI1 != null)
-            SWI1.Text = direct ? "^" : ">";
+        foreach (SwIndicator swi in allSWIs)
+        {
+            swi.SetDirect(direct);
+        }
     }
 
     private void CreateSwitches()
@@ -124,13 +147,15 @@ public class IntersectionsMgr : MonoBehaviour
 
     private int nextKi(int sI, int kI)
     {
-        if (sI < 0 || sI >= nbKnots.Length) return -1;
+        if (nbKnots == null || sI < 0 || sI >= nbKnots.Length) return -1;
         return (kI + 1) % nbKnots[sI];
     }
 
     public bool getKnotLink(int sI, int kI, out SimpleSwitch simpleSwitch)
     {
         simpleSwitch = new SimpleSwitch();
+
+        if (kLinks == null) return false;
 
         // Check if Current position if between 2 joined knots.
         int kI2 = nextKi(sI, kI);
@@ -177,7 +202,7 @@ public class IntersectionsMgr : MonoBehaviour
      */
     public int GetNewSplineId(int sI, int kI, bool isFwd)
     {
-        if (!switches.TryGetValue(new SplineKnotIndex(sI, kI), out SimpleSwitch ss))
+        if (switches == null || !switches.TryGetValue(new SplineKnotIndex(sI, kI), out SimpleSwitch ss))
         {
             return sI;
         }
@@ -204,14 +229,27 @@ public class IntersectionsMgr : MonoBehaviour
         // Currently on a section that has 2 possible path
         // Search for switch managing this path
 
-        bool choice = (int)slider.value != 0; // TODO, One slider per switch!
+        bool direct;
+        if (allDirect)
+        {
+            direct = true;
+        }
+        else if (allDeviate)
+        {
+            direct = false;
+        }
+        else
+        {
+            // TODO!
+            direct = true;
+        }
         // Debug.Log($"Select {choice} from S{ss}, isFwd={isFwd}");
-        return ss.SelectSpline(choice, isFwd);
+        return ss.SelectSpline(!direct, isFwd);
     }
 
     public int GetKnotIndex(int splineIndex, float t)
     {
-        if (splineIndex < 0 || splineIndex >= tValues.Length)
+        if (tValues == null || splineIndex < 0 || splineIndex >= tValues.Length)
             return -1;
 
         int knotCount = tValues[splineIndex].Length;
