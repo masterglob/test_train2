@@ -15,6 +15,8 @@ public class IntersectionsMgr : MonoBehaviour
     private SwIndicator[] allSWIs;
     public SwIndicator[] GetSWIs(){return allSWIs;}
 
+    public TMP_Text UiErrMsg;
+
     private float[][] tValues;
     private int[] nbKnots; // idx=  spline;
     private Dictionary<SplineKnotIndex, SplineKnotIndex> kLinks;
@@ -30,6 +32,7 @@ public class IntersectionsMgr : MonoBehaviour
     // For switch indicators
     public RectTransform uiPanel = null;
     public GameObject btnPrefab;
+    public GameObject btnAckPrefab;
     private List<UIIndicator> uiIndicators = new List<UIIndicator>();
     private float yBtnOffset = 50f;
     private float xBtnOffset = 300f;
@@ -118,7 +121,7 @@ public class IntersectionsMgr : MonoBehaviour
             Button btn = go.GetComponent<Button>();
             if (btn != null)
             {
-                btn.onClick.AddListener(() => OnButtonClicked(swi));
+                btn.onClick.AddListener(() => OnSwitchButtonClicked(swi));
             }
 
             UIIndicator ui = go.GetComponent<UIIndicator>();
@@ -143,10 +146,36 @@ public class IntersectionsMgr : MonoBehaviour
                 currentY -= yBtnOffset;
             }
         }
+
+        // Ack button for errors
+        if (currentX > 1f)
+        {
+            currentX = 0f;
+            currentY -= yBtnOffset;
+        }
+        {
+            GameObject go = Instantiate(btnAckPrefab, uiPanel);
+
+            Button btn = go.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.AddListener(() => OnAckButtonClicked()); //TODO
+                // btn.interactable = false;
+            }
+
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(currentX, currentY);
+        }
     }
 
-    // Fonction qui sera appelée lors du clic
-    private void OnButtonClicked(SwIndicator swi)
+    // Click on Ack button
+    private void OnAckButtonClicked()
+    {
+        ResetError();
+    }
+
+    // Clic on Switch button
+    private void OnSwitchButtonClicked(SwIndicator swi)
     {
         // Attention le clic est sur le Bouton, il faut retrouver le
         // Switch qui correspond
@@ -184,11 +213,11 @@ public class IntersectionsMgr : MonoBehaviour
             for (int kI = sI + 1; kI < spline.Count; kI++)
             {
                 BezierKnot k = spline[kI];
-                if (getKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
+                if (CreateKnotLink(sI, kI, out SimpleSwitch simpleSwitch))
                 {
                     simpleSwitch.Normalize();
                     // Find matching Indicator (SWI)
-                    Debug.Log($"Add switch S{sI}K{kI} => S{simpleSwitch}");
+                    // Debug.Log($"Add switch S{sI}K{kI} => S{simpleSwitch}");
                     switches[simpleSwitch.GetDirectKnot()] = simpleSwitch;
                     switches[simpleSwitch.GetDeviateKnot()] = simpleSwitch;
                     simpleSwitch.AssignSwi(splineContainer, allSWIs);
@@ -208,7 +237,7 @@ public class IntersectionsMgr : MonoBehaviour
         return tValues[splineIndex][knotIndex];
     }
 
-    private int nextKi(int sI, int kI, bool isFwd=true)
+    public int nextKi(int sI, int kI, bool isFwd=true)
     {
         if (isFwd)
         {
@@ -224,8 +253,19 @@ public class IntersectionsMgr : MonoBehaviour
 
     public bool getKnotLink(int sI, int kI, out SimpleSwitch simpleSwitch)
     {
-        simpleSwitch = new SimpleSwitch();
 
+        if (kLinks != null &&
+            switches.TryGetValue(new SplineKnotIndex(sI, kI), out simpleSwitch))
+        {
+            return true;
+        }
+        simpleSwitch = new SimpleSwitch();
+        return false;
+    }
+
+    private bool CreateKnotLink(int sI, int kI, out SimpleSwitch simpleSwitch)
+    {
+        simpleSwitch = new SimpleSwitch();
         if (kLinks == null) return false;
 
         // Check if Current position if between 2 joined knots.
@@ -235,6 +275,7 @@ public class IntersectionsMgr : MonoBehaviour
             || linked1.Spline != linked2.Spline
             || !isNear(linked2.Spline, linked1.Knot, linked2.Knot))
             return false;
+
 
         int sI2 = linked2.Spline;
         simpleSwitch.Spline1Id = sI;
@@ -355,5 +396,23 @@ public class IntersectionsMgr : MonoBehaviour
             kI = nextKi(sI, kI, isFwd);
         }
         return null;
+    }
+
+    public void SetError(string message)
+    {
+        Debug.LogError(message);
+        UiErrMsg.text = message;
+        UiErrMsg.enabled = true;
+    }
+
+    public void ResetError()
+    {
+        UiErrMsg.text = "";
+        UiErrMsg.enabled = false;
+    }
+
+    public string GetError()
+    {
+        return UiErrMsg.text;
     }
 }

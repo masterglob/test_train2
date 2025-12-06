@@ -45,20 +45,35 @@ public class SimpleSwitch
         SetDirect(!HasDirectPos);
     }
 
-    /**
-     * Param isSpline1 : True to check if Spline1 can be used on non-dead end. 
-     *                   False for Spline2
-     * Return False if the given spline is not matching the needle direction
-     */
-    public bool CanUseSwitchFor(int spline1Id, bool Knot1)
+    public bool CanEnterSwitchAt(int sI, int kI)
     {
-        Debug.Log($"CanUseSwitchFor({spline1Id},{Knot1}, SS={this})");
-        if (IsKnotDeadEnd(Knot1)) return true;
+        Debug.Log($"CanEnterSwitchAt(si={sI}, kI={kI})");
+        bool isS1 = (sI == Spline1Id);
+        bool isS2 = (sI == Spline2Id);
+        if (isS1 == isS2)
+        {
+            Debug.LogError($"Invalid Spline{sI} in {this}");
+            return false;
+        }
 
-        bool isSpline1 = (spline1Id == Spline1Id);
-        bool isDead1 = IsSplineDeadEnd(isSpline1);
-        Debug.Log($"Is not dead END!.HasDirectPos={HasDirectPos},Spline1Id={spline1Id}, isSpline1={isSpline1}, isDead1={isDead1}");
-        return HasDirectPos != isDead1;
+        // Check if sI/kI is on dead end or not (On dead End it's always OK)
+        // Is the Dead End is on given spline?
+        if (isS1 && kI == Spline1CloseKnotId || isS2 && kI == Spline2CloseKnotId)
+            return true;
+
+        // Is the Dead End on the OTHER spline?
+        if ((isS1 && kI == Spline1Knot1 && Spline2Knot1 == Spline2CloseKnotId)
+            ||
+            (isS1 && kI == Spline1Knot2 && Spline2Knot2 == Spline2CloseKnotId)
+            ||
+            (isS2 && kI == Spline2Knot1 && Spline1Knot1 == Spline1CloseKnotId)
+            ||
+            (isS2 && kI == Spline2Knot2 && Spline1Knot2 == Spline1CloseKnotId)
+            )
+            return true;
+
+        // On other end, simply check if current spline is active
+        return isS1 == HasDirectPos;
     }
     public int SelectSpline(bool s1, bool isFwd)
     {

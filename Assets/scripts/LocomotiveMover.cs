@@ -14,9 +14,8 @@ public class LocomotiveMover : MonoBehaviour
     private Spline currentSpline;
     public int splineId = 0;
 
-    static private SimpleSwitch InvalidSwitch = new SimpleSwitch();
-    private SimpleSwitch currentSwitch = InvalidSwitch;
-    private SimpleSwitch previousSwitch = InvalidSwitch;
+    private SimpleSwitch currentSwitch = null;
+    private SimpleSwitch previousSwitch = null;
 
     [SerializeField] private float speed = 0.0f;
     public TMP_Text textSpeed;
@@ -65,7 +64,6 @@ public class LocomotiveMover : MonoBehaviour
         int kI = interMgr.GetKnotIndex(splineId, t, out float subPos);
         textDebug.text = $" Position in S{splineId}/K{kI}";
 
-        previousSwitch = currentSwitch;
         if (interMgr.getKnotLink(splineId, kI, out SimpleSwitch ss))
         {
             currentSwitch = ss;
@@ -75,7 +73,7 @@ public class LocomotiveMover : MonoBehaviour
         }
         else
         {
-            currentSwitch = InvalidSwitch;
+            currentSwitch = null;
             // Search for next Switch (only when moving forward)
             if (speed > -0.01f)
             {
@@ -87,29 +85,29 @@ public class LocomotiveMover : MonoBehaviour
             }
         }
 
-        if (!currentSwitch.Compare(previousSwitch))
+        if (previousSwitch == null && currentSwitch != null)
         {
-            // Check consistency (No switch taken in bad direction)
+            Debug.Log("Switch ingress");
 
-            // isPt1First:
-            // - true :  (subPos = 0 => Spline1Knot1 & Spline2Knot1)
-            //       and (subPos = 1 => Spline1Knot2 & Spline2Knot2)
-            // - false : (subPos = 1 => Spline1Knot1 & Spline2Knot1)
-            //       and (subPos = 0 => Spline1Knot2 & Spline2Knot2)
-            bool isPt1First = subPos < 0.5;
+            // Check consistency (No switch taken in bad direction)
+            int kJ = kI;
+            if (subPos > 0.5)
+            {
+                kJ = interMgr.nextKi(splineId, kI);
+            }
 
             // Check if the "side" we entered the switch contains a dead end
             // (if so, there is no possible issue)
-            if (ss.CanUseSwitchFor(splineId, isPt1First))
+            if (ss.CanEnterSwitchAt(splineId, kJ))
             {
-                Debug.Log($"Switch Can use Spline{splineId},isPt1First={isPt1First} on {ss}");
+                // Debug.Log($"Switch Can use Spline{splineId},isPt1First={isPt1First} on {ss}");
             }
             else
             {
-                Debug.LogError($"Switch CANNOT use Spline{splineId},isPt1First={isPt1First} on {ss}");
+                interMgr.SetError($"Invalid switch cross: {ss}");
             }
-
         }
+        previousSwitch = currentSwitch;
     }
 
     private void CheckSplineChange(float t, float fwdSpeed)

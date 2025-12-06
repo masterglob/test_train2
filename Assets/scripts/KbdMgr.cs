@@ -44,15 +44,20 @@ public class KbdMgr : MonoBehaviour
         // Change directions
         if (keyboard.aKey.isPressed) // Q on AZERTY!
         {
-            // TODO direct switch!
             if (interMgr != null)
                 interMgr.SetGlobalDirect(true);
         }
         if (keyboard.dKey.isPressed)
         {
-            // TODO alternate switch!
             if (interMgr != null)
                 interMgr.SetGlobalDirect(false);
+        }
+        
+        // ACK msg
+        if (keyboard.qKey.isPressed) // A on AZERTY!
+        {
+            if (interMgr != null)
+                interMgr.ResetError();
         }
     }
 }
