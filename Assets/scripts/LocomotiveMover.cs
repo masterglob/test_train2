@@ -12,7 +12,7 @@ public class LocomotiveMover : MonoBehaviour
     public SplineContainer rail; 
 
     private Spline currentSpline;
-    private int splineId = 0;
+    public int splineId = 0;
 
     [SerializeField] private float speed = 0.0f;
     public TMP_Text textSpeed;
@@ -33,7 +33,11 @@ public class LocomotiveMover : MonoBehaviour
         currentSpline = null;
         if (rail != null && rail.Splines != null && rail.Splines.Count > 0)
         {
-            splineId = 0;
+            if (splineId >= rail.Splines.Count)
+            {
+                Debug.LogError($"Invalid spawn Spline Id:{splineId}");
+                splineId = 0;
+            }
             currentSpline = rail.Splines[splineId];
         }
     }
