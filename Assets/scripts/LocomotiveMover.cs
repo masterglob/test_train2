@@ -87,8 +87,6 @@ public class LocomotiveMover : MonoBehaviour
 
         if (previousSwitch == null && currentSwitch != null)
         {
-            Debug.Log("Switch ingress");
-
             // Check consistency (No switch taken in bad direction)
             int kJ = kI;
             if (subPos > 0.5)
