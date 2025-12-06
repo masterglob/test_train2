@@ -4577,6 +4577,7 @@ Transform:
   m_Children:
   - {fileID: 1967100143}
   - {fileID: 1312062491}
+  - {fileID: 1383048965}
   m_Father: {fileID: 24506415}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &594628957
@@ -4860,7 +4861,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 185.84
+      value: 178.82
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4868,7 +4869,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 94.13
+      value: 84.82
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4904,14 +4905,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: d964014b0b09fec4f96bfecd6e53357a, type: 2}
     - target: {fileID: 919132149155446097, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       propertyPath: m_Name
-      value: minecart_v2
+      value: Train1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1700341553}
+    m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e8cea3253fb789e4ab963d4aebf0911d, type: 3}
       insertIndex: -1
@@ -18510,7 +18508,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06f5b9c2b01917748bb7a13eb427db13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KbdMgr
-  loco1: {fileID: 1967100148}
+  loco1: {fileID: 1383048966}
   loco2: {fileID: 1312062492}
   interMgr: {fileID: 1721501}
   power: 1
@@ -18992,6 +18990,38 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358208933}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1383048964 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1756464774094550, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+  m_PrefabInstance: {fileID: 1792324640}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1383048965 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+  m_PrefabInstance: {fileID: 1792324640}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1383048966
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383048964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6db021ae1f9715c408365c59902b661c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocomotiveMover
+  rail: {fileID: 458733551}
+  splineId: 0
+  speed: 0
+  textSpeed: {fileID: 962819773}
+  textCurrSpline: {fileID: 117625870}
+  textDebug: {fileID: 128575211}
+  maxSpeed: 30
+  drag: 0.6
+  maxAccel: 5
+  interMgr: {fileID: 1721501}
 --- !u!1 &1413065563
 GameObject:
   m_ObjectHideFlags: 0
@@ -31867,7 +31897,7 @@ GameObject:
   - component: {fileID: 1700341556}
   - component: {fileID: 1700341554}
   m_Layer: 0
-  m_Name: Camera
+  m_Name: CAMERA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31881,13 +31911,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1700341552}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.15116954, y: 0.0000000037252903, z: -0.0000000036094043, w: 0.9885079}
-  m_LocalPosition: {x: -0.07, y: 6.61, z: -10.31}
+  m_LocalRotation: {x: 0.19066177, y: -0.0027542263, z: 0.00053495355, w: 0.9816518}
+  m_LocalPosition: {x: -0.15, y: 6.98, z: -12.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1967100143}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 1383048965}
+  m_LocalEulerAnglesHint: {x: 21.983, y: -0.322, z: 0}
 --- !u!114 &1700341554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32384,6 +32414,69 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1001 &1792324640
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 584655711}
+    m_Modifications:
+    - target: {fileID: 1756464774094550, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_Name
+      value: Industrial Train Dr14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 187.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.20282173
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 87.98
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.13373868
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9910167
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 164.629
+      objectReference: {fileID: 0}
+    - target: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4082935477391056, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1700341553}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1756464774094550, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1383048966}
+  m_SourcePrefab: {fileID: 100100000, guid: 6e35b9c040b5a1248ab789b5a16c9af8, type: 3}
 --- !u!1 &1815292951
 GameObject:
   m_ObjectHideFlags: 0
@@ -32801,7 +32894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6db021ae1f9715c408365c59902b661c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocomotiveMover
-  rail: {fileID: 458733551}
+  rail: {fileID: 0}
   splineId: 0
   speed: 0
   textSpeed: {fileID: 962819773}
