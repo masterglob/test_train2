@@ -47,12 +47,10 @@ public class SimpleSwitch
 
     public bool CanEnterSwitchAt(int sI, int kI)
     {
-        Debug.Log($"CanEnterSwitchAt(si={sI}, kI={kI})");
         bool isS1 = (sI == Spline1Id);
         bool isS2 = (sI == Spline2Id);
         if (isS1 == isS2)
         {
-            Debug.LogError($"Invalid Spline{sI} in {this}");
             return false;
         }
 

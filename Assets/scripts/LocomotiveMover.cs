@@ -258,4 +258,13 @@ public class LocomotiveMover : MonoBehaviour
     {
         speed *= 0.9f;
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // Vérifie si l'objet entrant est un wagon
+        if (other.CompareTag("Wagon") || other.CompareTag("Train"))
+        {
+            interMgr.SetError($"Collision {other.gameObject.name} / {gameObject.name} ");
+        }
+    }
 }
