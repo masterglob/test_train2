@@ -32273,7 +32273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0486a75e19e99b440b3006d1cdd669a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwIndicator
-  divergingOnRight: 1
+  divergingOnRight: 0
   uiIndicator: {fileID: 0}
 --- !u!1 &1877127919
 GameObject:
@@ -32569,7 +32569,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocomotiveMover
   rail: {fileID: 458733551}
-  speed: 1
+  splineId: 5
+  speed: 0
   textSpeed: {fileID: 962819773}
   textCurrSpline: {fileID: 117625870}
   textDebug: {fileID: 128575211}

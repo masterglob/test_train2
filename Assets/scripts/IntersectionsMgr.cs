@@ -303,8 +303,14 @@ public class IntersectionsMgr : MonoBehaviour
         return ss.SelectSpline(!ss.IsDirect(), isFwd);
     }
 
-    public int GetKnotIndex(int splineIndex, float t)
+    /* Return the KnotIndex Ki so that t is on Spline[SplinIndex] between kI and kI + 1 
+     * This function take into account the case of closed loop.
+     * Return 6& if not found
+     * - subPos returns a flost [0..1]: 0 => position is on kI, 1=> on kI+1
+     */
+    public int GetKnotIndex(int splineIndex, float t, out float subPos)
     {
+        subPos = 0.5f;
         if (tValues == null || splineIndex < 0 || splineIndex >= tValues.Length)
             return -1;
 
@@ -320,7 +326,10 @@ public class IntersectionsMgr : MonoBehaviour
             float t1 = GetT(splineIndex, kI + 1);
 
             if (t >= t0 && t < t1)
+            {
+                subPos = (t-t0)/(t1-t0);
                 return kI;
+            }
         }
 
         // Si t est supérieur ou égal au dernier t, on retourne le dernier index

@@ -27,11 +27,39 @@ public class SimpleSwitch
         }
     }
 
+    private bool IsSplineDeadEnd(bool spline1)
+    { 
+        return spline1 ? Spline1CloseKnotId >= 0 : Spline2CloseKnotId >= 0;
+    }
+
+    public bool IsKnotDeadEnd(bool Knot1)
+    {
+        return Knot1 ?
+            (Spline1CloseKnotId == Spline1Knot1 || Spline2CloseKnotId == Spline2Knot1)
+            :
+            (Spline1CloseKnotId == Spline2Knot1 || Spline2CloseKnotId == Spline2Knot2);
+    }
+
     public void InvertDirect()
     {
         SetDirect(!HasDirectPos);
     }
 
+    /**
+     * Param isSpline1 : True to check if Spline1 can be used on non-dead end. 
+     *                   False for Spline2
+     * Return False if the given spline is not matching the needle direction
+     */
+    public bool CanUseSwitchFor(int spline1Id, bool Knot1)
+    {
+        Debug.Log($"CanUseSwitchFor({spline1Id},{Knot1}, SS={this})");
+        if (IsKnotDeadEnd(Knot1)) return true;
+
+        bool isSpline1 = (spline1Id == Spline1Id);
+        bool isDead1 = IsSplineDeadEnd(isSpline1);
+        Debug.Log($"Is not dead END!.HasDirectPos={HasDirectPos},Spline1Id={spline1Id}, isSpline1={isSpline1}, isDead1={isDead1}");
+        return HasDirectPos != isDead1;
+    }
     public int SelectSpline(bool s1, bool isFwd)
     {
         // Check if this is a closed end
@@ -85,6 +113,7 @@ public class SimpleSwitch
 
     public bool Compare(SimpleSwitch other)
     {
+        if(other == null) return false;
         return (Spline1Id == other.Spline1Id &&
                Spline2Id == other.Spline2Id &&
                Spline1Knot1 == other.Spline1Knot1 &&
