@@ -9,7 +9,7 @@ using TMPro;
 
 public class LocomotiveMover : MonoBehaviour
 {
-    public SplineContainer rail; 
+    private SplineContainer rail = null;
 
     private Spline currentSpline;
     public int splineId = 0;
@@ -33,8 +33,9 @@ public class LocomotiveMover : MonoBehaviour
 
     void Start()
     {
-
         currentSpline = null;
+        if (interMgr != null)
+            rail = interMgr.splineContainer;
         if (rail != null && rail.Splines != null && rail.Splines.Count > 0)
         {
             if (splineId >= rail.Splines.Count)
@@ -69,7 +70,7 @@ public class LocomotiveMover : MonoBehaviour
             currentSwitch = ss;
             dbgMSg += "\n";
             dbgMSg += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
-            dbgMSg += $"\n subPos={subPos * 100:00}%";
+            // dbgMSg += $"\n subPos={subPos * 100:00}%";
         }
         else
         {
@@ -105,7 +106,7 @@ public class LocomotiveMover : MonoBehaviour
             }
             else
             {
-                interMgr.SetError($"Invalid switch cross: {ss}");
+                interMgr.SetError($"Invalid switch cross: {ss.ToShortString()}");
             }
         }
         previousSwitch = currentSwitch;
@@ -133,12 +134,10 @@ public class LocomotiveMover : MonoBehaviour
     {
         if (currentSpline == null)
         {
-            Debug.LogError("Assign a currentSpline in Locomotive Mover.");
             return;
         }
         if (interMgr == null)
         {
-            Debug.LogError("Assign a interMgr in Locomotive Mover.");
             return;
         }
 
