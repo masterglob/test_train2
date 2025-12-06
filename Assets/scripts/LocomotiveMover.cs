@@ -174,6 +174,11 @@ public class LocomotiveMover : MonoBehaviour
         {
             return;
         }
+        // Optional: freeze when error is met!
+        if (interMgr.GetError() != "")
+        {
+            return;
+        }
 
         Vector3 previousPosition = transform.position;
         updateParams();
