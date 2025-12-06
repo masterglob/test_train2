@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Splines;
 using Unity.Mathematics;
 using System;
+using System.Collections.Generic;
 
 using TMPro;
 
@@ -35,6 +36,7 @@ public class LocomotiveMover : MonoBehaviour
     public LocomotiveMover follows = null;
     [Tooltip("If follows is set, this is the distance to followed Object")]
     public float distanceToFollowed = 5f;
+    private List<LocomotiveMover> followers = new List<LocomotiveMover>();
 
     [Header("UI options")]
     public TMP_Text textSpeed;
@@ -48,6 +50,7 @@ public class LocomotiveMover : MonoBehaviour
         if (follows != null)
         {
             currentSpline = follows.currentSpline;
+            follows.followers.Add(this);
         }
 
         if (interMgr != null)
@@ -148,6 +151,21 @@ public class LocomotiveMover : MonoBehaviour
 
     private void FixedUpdate()
     {
+        /*
+         * Note : If all objects are updated here, as the sequence is not defined, and
+         * as followers copy the followed object, there is a strange effect when speed
+         * increases: the wagon gets more distant.
+         * To avoid this effect, only the "loco" is moved and Wagons are updated 
+         * afterwards.
+         */
+        if (follows == null)
+        { 
+            ActualFixedUpdate();
+        }
+    }
+
+    private void ActualFixedUpdate()
+    {
         if (currentSpline == null)
         {
             return;
@@ -187,6 +205,11 @@ public class LocomotiveMover : MonoBehaviour
         float dot = Vector3.Dot(forward, velocity.normalized);
         CheckSplineChange(t, dot);
 
+        // Update followers, using the new computed position for this object.
+        foreach (var follower in followers)
+        {
+            follower.ActualFixedUpdate();
+        }
     }
 
     private void updateParams()
@@ -218,8 +241,6 @@ public class LocomotiveMover : MonoBehaviour
             // Convertir cette distance dans le monde en appliquant la rotation de follows
             transform.position = follows.transform.position + follows.transform.rotation * localOffset;
 
-            // Suivre aussi la rotation de follows (si nécessaire)
-            transform.rotation = follows.transform.rotation;
             speed = follows.speed;
         }
         if (textSpeed != null)
