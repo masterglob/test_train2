@@ -62,14 +62,14 @@ public class LocomotiveMover : MonoBehaviour
     private void test(float t)
     {
         int kI = interMgr.GetKnotIndex(splineId, t, out float subPos);
-        textDebug.text = $" Position in S{splineId}/K{kI}";
+        string dbgMSg = $" Position in S{splineId}/K{kI}";
 
         if (interMgr.getKnotLink(splineId, kI, out SimpleSwitch ss))
         {
             currentSwitch = ss;
-            textDebug.text += "\n";
-            textDebug.text += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
-            textDebug.text += $"\n subPos={subPos * 100:00}%";
+            dbgMSg += "\n";
+            dbgMSg += $" Comm S{ss.Spline1Id}/K{ss.Spline1Knot1} <=> S{ss.Spline2Id}/K{ss.Spline2Knot1}";
+            dbgMSg += $"\n subPos={subPos * 100:00}%";
         }
         else
         {
@@ -80,10 +80,13 @@ public class LocomotiveMover : MonoBehaviour
                 SimpleSwitch ss2 = interMgr.ShowNextSwitch(splineId, kI, !isBwd);
                 if (ss2 != null)
                 {
-                    textDebug.text += $"\nNext switch:{ss2.ToShortString()} ";
+                    dbgMSg += $"\nNext switch:{ss2.ToShortString()} ";
                 }
             }
         }
+
+        if (textDebug != null)
+            textDebug.text = dbgMSg;
 
         if (previousSwitch == null && currentSwitch != null)
         {
@@ -190,8 +193,10 @@ public class LocomotiveMover : MonoBehaviour
             speed += drag * Time.fixedDeltaTime;
             if (speed > 0f) speed = 0f;
         }
-        textSpeed.text = $"Speed: {speed:F2} m/s";
-        textCurrSpline.text = $"Track: {splineId}";
+        if (textSpeed != null)
+            textSpeed.text = $"Speed: {speed:F2} m/s";
+        if (textCurrSpline != null)
+            textCurrSpline.text = $"Track: {splineId}";
     }
 
     public void Throttle(float power)

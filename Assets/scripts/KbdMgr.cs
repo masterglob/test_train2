@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 
 public class KbdMgr : MonoBehaviour
 {
-    public LocomotiveMover loco;
+    public LocomotiveMover loco1;
+    public LocomotiveMover loco2;
     public IntersectionsMgr interMgr = null;
 
     [SerializeField] private float power = 1.0f;
@@ -15,49 +16,59 @@ public class KbdMgr : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (loco == null)
-        {
-            Debug.LogError("Assign a loco in KbdMgr.");
-            return;
-        }
-        if (interMgr == null)
-        {
-            Debug.LogError("Assign a interMgr in KbdMgr.");
-            return;
-        }
         var keyboard = Keyboard.current;
-        if (keyboard.wKey.isPressed) // Z on AZERTY
+
+        if (loco1 != null)
         {
-            loco.Throttle(power);
+            if (keyboard.wKey.isPressed) // Z on AZERTY
+            {
+                loco1.Throttle(power);
+            }
+
+            if (keyboard.sKey.isPressed)
+            {
+                loco1.Throttle(-power);
+            }
+            // Freinage rapide!
+            if (keyboard.spaceKey.isPressed)
+            {
+                loco1.Brake();
+            }
         }
 
-        if (keyboard.sKey.isPressed)
+        if (loco2 != null)
         {
-            loco.Throttle(-power);
-        }
-        // Freinage rapide!
-        if (keyboard.spaceKey.isPressed)
-        {
-            loco.Brake();
+            if (keyboard.upArrowKey.isPressed)
+            {
+                loco2.Throttle(power);
+            }
+            if (keyboard.downArrowKey.isPressed)
+            {
+                loco2.Brake();
+            }
         }
 
         // Change directions
-        if (keyboard.aKey.isPressed) // Q on AZERTY!
+
+        if (interMgr != null)
         {
-            if (interMgr != null)
-                interMgr.SetGlobalDirect(true);
-        }
-        if (keyboard.dKey.isPressed)
-        {
-            if (interMgr != null)
-                interMgr.SetGlobalDirect(false);
-        }
-        
-        // ACK msg
-        if (keyboard.qKey.isPressed) // A on AZERTY!
-        {
-            if (interMgr != null)
-                interMgr.ResetError();
+            if (keyboard.aKey.isPressed) // Q on AZERTY!
+            {
+                if (interMgr != null)
+                    interMgr.SetGlobalDirect(true);
+            }
+            if (keyboard.dKey.isPressed)
+            {
+                if (interMgr != null)
+                    interMgr.SetGlobalDirect(false);
+            }
+
+            // ACK msg
+            if (keyboard.qKey.isPressed) // A on AZERTY!
+            {
+                if (interMgr != null)
+                    interMgr.ResetError();
+            }
         }
     }
 }
