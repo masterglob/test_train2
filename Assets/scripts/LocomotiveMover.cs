@@ -12,28 +12,44 @@ public class LocomotiveMover : MonoBehaviour
     private SplineContainer rail = null;
 
     private Spline currentSpline;
+    [Tooltip("Current spline index in SplineContainer")]
     public int splineId = 0;
 
     private SimpleSwitch currentSwitch = null;
     private SimpleSwitch previousSwitch = null;
 
     [SerializeField] private float speed = 0.0f;
-    public TMP_Text textSpeed;
-    public TMP_Text textCurrSpline = null;
-    public TMP_Text textDebug = null;
+    
+    [Tooltip("Maximum Speed")]
     public float maxSpeed = 50f;      // vitesse max (m/s)
-    public float drag = 0.5f;         // friction naturelle (m/s²)
+    [Tooltip("Natural friction (m/s²)")]
+    public float drag = 0.5f;
 
-    [Header("Acceleration")]
+    [Tooltip("Maximum acceleration")]
     public float maxAccel = 5f;       // accélération max (m/s²)
 
     public IntersectionsMgr interMgr = null;
     private bool isBwd = false;
 
+    [Tooltip("Optional. If provided, the object will follow given reference")]
+    public LocomotiveMover follows = null;
+    [Tooltip("If follows is set, this is the distance to followed Object")]
+    public float distanceToFollowed = 5f;
+
+    [Header("UI options")]
+    public TMP_Text textSpeed;
+    public TMP_Text textCurrSpline = null;
+    public TMP_Text textDebug = null;
 
     void Start()
     {
         currentSpline = null;
+        // Si follows est non null, on mémorise la distance initiale
+        if (follows != null)
+        {
+            currentSpline = follows.currentSpline;
+        }
+
         if (interMgr != null)
             rail = interMgr.splineContainer;
         if (rail != null && rail.Splines != null && rail.Splines.Count > 0)
@@ -175,22 +191,36 @@ public class LocomotiveMover : MonoBehaviour
 
     private void updateParams()
     {
-        // Apply current speed
-        Vector3 engineForward = transform.forward;
-        float move = speed * Time.fixedDeltaTime;
-        transform.Translate(Vector3.forward * move);
+        if (follows == null)
+        { 
+            // Apply current speed
+            Vector3 engineForward = transform.forward;
+            float move = speed * Time.fixedDeltaTime;
+            transform.Translate(Vector3.forward * move);
 
-        speed = Mathf.Clamp(speed, -maxSpeed, maxSpeed);
-        // Appliquer friction
-        if (speed > 0f)
-        {
-            speed -= drag * Time.fixedDeltaTime;
-            if (speed < 0f) speed = 0f;
+            speed = Mathf.Clamp(speed, -maxSpeed, maxSpeed);
+            // Appliquer friction
+            if (speed > 0f)
+            {
+                speed -= drag * Time.fixedDeltaTime;
+                if (speed < 0f) speed = 0f;
+            }
+            else if (speed < 0f)
+            {
+                speed += drag * Time.fixedDeltaTime;
+                if (speed > 0f) speed = 0f;
+            }
         }
-        else if (speed < 0f)
+        else
         {
-            speed += drag * Time.fixedDeltaTime;
-            if (speed > 0f) speed = 0f;
+            Vector3 localOffset = new Vector3(0f, 0f, -distanceToFollowed);
+
+            // Convertir cette distance dans le monde en appliquant la rotation de follows
+            transform.position = follows.transform.position + follows.transform.rotation * localOffset;
+
+            // Suivre aussi la rotation de follows (si nécessaire)
+            transform.rotation = follows.transform.rotation;
+            speed = follows.speed;
         }
         if (textSpeed != null)
             textSpeed.text = $"Speed: {speed:F2} m/s";
